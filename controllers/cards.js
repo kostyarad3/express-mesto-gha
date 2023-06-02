@@ -6,7 +6,6 @@ const ERROR_NOT_FOUND = 404;
 const ERROR_SERVER = 500;
 
 function getCards(req, res) {
-  // eslint-disable-next-line no-console
   Card.find({})
     .then((cards) => res.send({ data: cards }))
     .catch((err) => {
