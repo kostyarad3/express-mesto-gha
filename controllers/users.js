@@ -1,9 +1,6 @@
 /* eslint-disable no-unused-vars */
 const User = require('../models/user');
-
-const ERROR_BAD_REQUEST = 400;
-const ERROR_NOT_FOUND = 404;
-const ERROR_SERVER = 500;
+const { ERROR_BAD_REQUEST, ERROR_NOT_FOUND, ERROR_SERVER } = require('../utils/constants');
 
 function getUsers(req, res) {
   // eslint-disable-next-line no-console
@@ -31,7 +28,7 @@ function createUser(req, res) {
   User.create({ name, about, avatar })
     .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
-      if (err.message.includes('validation failed')) {
+      if (err.name === 'ValidationError') {
         res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при создании пользователя.' });
         return;
       }
@@ -47,16 +44,15 @@ function updateUserInfo(req, res) {
     {
       new: true,
       runValidators: true,
-      upsert: true,
     },
   )
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.message.includes('validation failed')) {
+      if (err.name === 'CastError') {
         res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
         return;
       }
-      if (err.message === 'Not found') {
+      if (err.name === 'CastError') {
         res.status(ERROR_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
         return;
       }
@@ -72,16 +68,15 @@ function updateUserAvatar(req, res) {
     {
       new: true,
       runValidators: true,
-      upsert: true,
     },
   )
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.message.includes('validation failed')) {
+      if (err.name === 'ValidationError') {
         res.status(ERROR_BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
         return;
       }
-      if (err.message === 'Not found') {
+      if (err.name === 'CastError') {
         res.status(ERROR_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
         return;
       }
