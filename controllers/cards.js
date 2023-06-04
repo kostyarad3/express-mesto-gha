@@ -28,14 +28,14 @@ function deleteCard(req, res) {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
-        res.send({ message: 'Такой карточки не существует.' });
+        res.status(ERROR_NOT_FOUND).send({ message: 'Такой карточки не существует.' });
         return;
       }
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_NOT_FOUND).send('Передан несуществующий _id карточки.');
+        res.status(ERROR_BAD_REQUEST).send({ message: 'Передан несуществующий _id карточки.' });
         return;
       }
       res.status(ERROR_SERVER).send({ message: 'На сервере произошла ошибка' });
@@ -50,14 +50,14 @@ function setLike(req, res) {
   )
     .then((card) => {
       if (!card) {
-        res.send({ message: 'Такой карточки не существует.' });
+        res.status(ERROR_NOT_FOUND).send({ message: 'Такой карточки не существует.' });
         return;
       }
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_NOT_FOUND).send('Передан несуществующий _id карточки.');
+        res.status(ERROR_BAD_REQUEST).send({ message: 'Передан несуществующий _id карточки.' });
         return;
       }
       res.status(ERROR_SERVER).send({ message: 'На сервере произошла ошибка' });
@@ -72,14 +72,14 @@ function removeLike(req, res) {
   )
     .then((card) => {
       if (!card) {
-        res.send({ message: 'Такой карточки не существует.' });
+        res.status(ERROR_NOT_FOUND).send({ message: 'Такой карточки не существует.' });
         return;
       }
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_NOT_FOUND).send('Передан несуществующий _id карточки.');
+        res.status(ERROR_BAD_REQUEST).send({ message: 'Передан несуществующий _id карточки.' });
         return;
       }
       res.status(ERROR_SERVER).send({ message: 'На сервере произошла ошибка' });
