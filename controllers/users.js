@@ -13,12 +13,16 @@ function getUserById(req, res) {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'Пользователь по указанному _id не найден.' });
+        res.status(ERROR_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
         return;
       }
       res.send({ data: user });
     })
     .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(ERROR_BAD_REQUEST).send({ message: 'Передан несуществующий _id пользователя.' });
+        return;
+      }
       res.status(ERROR_SERVER).send({ message: 'На сервере произошла ошибка' });
     });
 }
