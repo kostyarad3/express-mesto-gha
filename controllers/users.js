@@ -12,7 +12,13 @@ function getUsers(req, res) {
 function getUserById(req, res) {
   User.findById(req.params.userId)
     .orFail(() => new Error('Not found'))
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (!user) {
+        res.status(ERROR_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
+        return;
+      }
+      res.send({ data: user });
+    })
     .catch((err) => {
       if (err.message === 'Not found') {
         res.status(ERROR_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден.' });
