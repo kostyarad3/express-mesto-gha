@@ -1,11 +1,35 @@
 const router = require('express').Router();
+// eslint-disable-next-line import/no-extraneous-dependencies
+const { celebrate, Joi } = require('celebrate');
+const { LINK_REGEX } = require('../utils/constants');
 const userRoutes = require('./users');
 const cardRoutes = require('./cards');
-const { ERROR_NOT_FOUND } = require('../utils/constants');
+const { login, createUser } = require('../controllers/users');
+const auth = require('../middlewares/auth');
+const NotFoundError = require('../errors/not-found-err');
+
+router.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), login);
+
+router.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
+    avatar: Joi.string().required().pattern(LINK_REGEX),
+  }),
+}), createUser);
+
+router.use(auth);
 
 router.use('/users', userRoutes);
 router.use('/cards', cardRoutes);
 
-router.use('*', (req, res) => { res.status(ERROR_NOT_FOUND).send({ message: 'Страница не найдена' }); });
+router.use('*', (req, res, next) => next(new NotFoundError('Страница не найдена')));
 
 module.exports = router;
