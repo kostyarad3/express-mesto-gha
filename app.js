@@ -22,8 +22,8 @@ const app = express();
 app.use(express.json());
 
 app.use(routes);
-app.use(setError);
 app.use(errors());
+app.use(setError);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
