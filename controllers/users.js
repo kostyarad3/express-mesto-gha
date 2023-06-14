@@ -9,7 +9,7 @@ const ConflictError = require('../errors/conflict-err');
 function login(req, res, next) {
   const { email, password } = req.body;
 
-  User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       if (user) {
         const token = jwt.sign({ _id: user._id }, 'secret', {
@@ -17,14 +17,12 @@ function login(req, res, next) {
         });
         return res.status(200).send({ jwt: token });
       }
-
       throw new UnauthorizedError('Неправильные почта или пароль');
     })
     .catch(next);
 }
 
 function getUsers(req, res, next) {
-  // eslint-disable-next-line no-console
   User.find({})
     .then((users) => res.send({ data: users }))
     .catch(next);
@@ -67,24 +65,32 @@ function createUser(req, res, next) {
   const {
     email, password, name, about, avatar,
   } = req.body;
-  bcrypt.hash(password, 10)
-    .then((hash) => User.create({
-      email,
-      password: hash,
-      name,
-      about,
-      avatar,
-    }))
-    .then((user) => {
-      const { _id } = user;
 
-      res.status(201).send({
-        email,
-        name,
-        about,
-        avatar,
-        _id,
-      });
+  User.findOne({ email })
+    .then((isSaved) => {
+      if (!isSaved) {
+        bcrypt.hash(password, 10)
+          .then((hash) => User.create({
+            email,
+            password: hash,
+            name,
+            about,
+            avatar,
+          }))
+          .then((user) => {
+            const { _id } = user;
+
+            res.status(201).send({
+              email,
+              name,
+              about,
+              avatar,
+              _id,
+            });
+          });
+      } else {
+        throw new ConflictError('Пользователь с таким email уже существует');
+      }
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {

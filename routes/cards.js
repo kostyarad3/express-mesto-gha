@@ -1,17 +1,16 @@
-/* eslint-disable import/no-extraneous-dependencies */
 const { celebrate, Joi } = require('celebrate');
 const router = require('express').Router();
 const {
   getCards, createCard, deleteCard, setLike, removeLike,
 } = require('../controllers/cards');
-const { LINK_REGEX } = require('../utils/constants');
+const LINK_REGEX = require('../utils/constants');
 
 router.get('/', getCards);
 
 router.post('/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(LINK_REGEX),
+    link: Joi.string().required().regex(RegExp(LINK_REGEX)),
   }),
 }), createCard);
 
