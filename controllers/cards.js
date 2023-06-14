@@ -34,16 +34,8 @@ function deleteCard(req, res, next) {
             res.send({ data: cardToDelete });
           });
       } else {
-        throw new ForbiddenError('Нет прав на удаление чужой карточки');
+        next(new ForbiddenError('Нет прав на удаление чужой карточки'));
       }
-      // if (card.owner.id !== req.user._id) {
-      //   throw new ForbiddenError('Нет прав на удаление чужой карточки');
-      // }
-
-      // Card.findByIdAndRemove(req.params.cardId)
-      //   .then((cardToDelete) => {
-      //     res.send({ data: cardToDelete });
-      //   });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
