@@ -28,13 +28,13 @@ function deleteCard(req, res, next) {
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Такой карточки не существует');
-      } else if (card.owner.id !== req.user._id) {
+      } else if (card.owner.id === req.user._id) {
         Card.findByIdAndRemove(req.params.cardId)
           .then((cardToDelete) => {
             res.send({ data: cardToDelete });
           });
       } else {
-        next(new ForbiddenError('Нет прав на удаление чужой карточки'));
+        throw new ForbiddenError('Нет прав на удаление чужой карточки');
       }
     })
     .catch((err) => {
