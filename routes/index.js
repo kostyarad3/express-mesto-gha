@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
-const { LINK_REGEX } = require('../utils/constants');
+const LINK_REGEX = require('../utils/constants');
 // const userRoutes = require('./users');
 // const cardRoutes = require('./cards');
 const { login, createUser } = require('../controllers/users');
@@ -19,7 +19,7 @@ router.post('/signup', celebrate({
     password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(RegExp(LINK_REGEX)),
+    avatar: Joi.string().pattern(LINK_REGEX),
   }),
 }), createUser);
 
