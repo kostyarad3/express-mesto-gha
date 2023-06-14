@@ -28,15 +28,22 @@ function deleteCard(req, res, next) {
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Такой карточки не существует');
-      }
-      if (card.owner.id !== req.user._id) {
+      } else if (card.owner.id !== req.user._id) {
+        Card.findByIdAndRemove(req.params.cardId)
+          .then((cardToDelete) => {
+            res.send({ data: cardToDelete });
+          });
+      } else {
         throw new ForbiddenError('Нет прав на удаление чужой карточки');
       }
+      // if (card.owner.id !== req.user._id) {
+      //   throw new ForbiddenError('Нет прав на удаление чужой карточки');
+      // }
 
-      Card.findByIdAndRemove(req.params.cardId)
-        .then((cardToDelete) => {
-          res.send({ data: cardToDelete });
-        });
+      // Card.findByIdAndRemove(req.params.cardId)
+      //   .then((cardToDelete) => {
+      //     res.send({ data: cardToDelete });
+      //   });
     })
     .catch((err) => {
       if (err.name === 'CastError') {

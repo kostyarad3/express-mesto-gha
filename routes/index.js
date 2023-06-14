@@ -1,10 +1,7 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const LINK_REGEX = require('../utils/constants');
-// const userRoutes = require('./users');
-// const cardRoutes = require('./cards');
 const { login, createUser } = require('../controllers/users');
-// const auth = require('../middlewares/auth');
 
 router.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -22,10 +19,5 @@ router.post('/signup', celebrate({
     avatar: Joi.string().pattern(LINK_REGEX),
   }),
 }), createUser);
-
-// router.use(auth);
-
-// router.use('/users', userRoutes);
-// router.use('/cards', cardRoutes);
 
 module.exports = router;
