@@ -31,7 +31,7 @@ function deleteCard(req, res, next) {
       } else if (card.owner.id === req.user._id) {
         Card.findByIdAndRemove(req.params.cardId)
           .then((cardToDelete) => {
-            res.send({ data: cardToDelete });
+            res.status(200).send({ data: cardToDelete });
           });
       } else {
         throw new ForbiddenError('Нет прав на удаление чужой карточки');
