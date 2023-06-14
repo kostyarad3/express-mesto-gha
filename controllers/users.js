@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
@@ -16,7 +15,7 @@ function login(req, res, next) {
         const token = jwt.sign({ _id: user._id }, 'secret', {
           expiresIn: '7d',
         });
-        return res.send({ jwt: token });
+        return res.status(200).send({ jwt: token });
       }
 
       throw new UnauthorizedError('Неправильные почта или пароль');
@@ -35,7 +34,7 @@ function getCurrentUser(req, res, next) {
   User
     .findById(req.user._id)
     .then((user) => {
-      if (user) return res.send({ user });
+      if (user) return res.status(200).send({ user });
 
       throw new NotFoundError('Пользователь с таким id не найден');
     })
@@ -76,19 +75,25 @@ function createUser(req, res, next) {
       about,
       avatar,
     }))
-    .then((user) => res.status(201).send({
-      email,
-      name,
-      about,
-      avatar,
-      _id: user._id,
-    }))
+    .then((user) => {
+      const { _id } = user;
+
+      res.status(201).send({
+        email,
+        name,
+        about,
+        avatar,
+        _id,
+      });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные'));
+        return;
       }
       if (err.code === 11000) {
         next(new ConflictError('Пользователь с таким email уже существует'));
+        return;
       }
       next(err);
     });
@@ -112,6 +117,7 @@ function updateUserInfo(req, res, next) {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные'));
+        return;
       }
       next(err);
     });
@@ -135,6 +141,7 @@ function updateUserAvatar(req, res, next) {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные'));
+        return;
       }
       next(err);
     });
