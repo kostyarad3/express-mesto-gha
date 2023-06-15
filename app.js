@@ -2,6 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
+const cookieParser = require('cookie-parser');
 const routes = require('./routes/index');
 const setError = require('./middlewares/setError');
 const NotFoundError = require('./errors/not-found-err');
@@ -23,6 +24,7 @@ mongoose
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser);
 
 app.use(routes);
 app.use(auth);

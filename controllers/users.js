@@ -8,12 +8,16 @@ const ConflictError = require('../errors/conflict-err');
 
 function login(req, res, next) {
   const { email, password } = req.body;
-
   return User.findUserByCredentials(email, password)
     .then((user) => {
       if (user) {
         const token = jwt.sign({ _id: user._id }, 'secret', {
           expiresIn: '7d',
+        });
+        res.cookie('jwt', token, {
+          maxAge: 360000,
+          httpOnly: true,
+          sameSite: true,
         });
         return res.status(200).send({ jwt: token });
       }
@@ -87,7 +91,8 @@ function createUser(req, res, next) {
               avatar,
               _id,
             });
-          });
+          })
+          .catch(next);
       } else {
         throw new ConflictError('Пользователь с таким email уже существует');
       }
