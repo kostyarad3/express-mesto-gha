@@ -14,6 +14,7 @@ function login(req, res, next) {
         const token = jwt.sign({ _id: user._id }, 'secret', {
           expiresIn: '7d',
         });
+        // для второго варианта
         // res.cookie('jwt', token, {
         //   maxAge: 360000,
         //   httpOnly: true,

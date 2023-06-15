@@ -2,6 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
+// для второго варианта
 // const cookieParser = require('cookie-parser');
 const routes = require('./routes/index');
 const setError = require('./middlewares/setError');
@@ -24,6 +25,7 @@ mongoose
 
 const app = express();
 app.use(express.json());
+// для второго варианта
 // app.use(cookieParser);
 
 app.use(routes);
