@@ -27,12 +27,11 @@ function deleteCard(req, res, next) {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        throw new NotFoundError('Такой карточки не существует');
-      } else if (card.owner.id.equals(req.user._id)) {
-        return Card.deleteOne(card);
-      } else {
+        next(new NotFoundError('Такой карточки не существует'));
+      } else if (!card.owner.id.equals(req.user._id)) {
         next(new ForbiddenError('Нет прав на удаление чужой карточки'));
       }
+      return Card.deleteOne(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
