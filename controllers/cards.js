@@ -27,12 +27,13 @@ function deleteCard(req, res, next) {
   Card.findById(req.params.cardId)
     .orFail(new NotFoundError('Такой карточки не существует'))
     .then((card) => {
-      if (!card.owner.equals(req.user._id)) {
+      if (card.owner.equals(req.user._id)) {
+        Card.deleteOne(card)
+          .then((deletedCard) => res.send({ data: deletedCard }))
+          .catch(next);
+      } else {
         next(new ForbiddenError('Нет прав на удаление чужой карточки'));
       }
-      return Card.deleteOne(card)
-        .then((deletedCard) => res.send({ data: deletedCard }))
-        .catch(next);
     })
     .catch(next);
 }
