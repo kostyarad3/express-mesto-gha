@@ -14,11 +14,11 @@ function login(req, res, next) {
         const token = jwt.sign({ _id: user._id }, 'secret', {
           expiresIn: '7d',
         });
-        res.cookie('jwt', token, {
-          maxAge: 360000,
-          httpOnly: true,
-          sameSite: true,
-        });
+        // res.cookie('jwt', token, {
+        //   maxAge: 360000,
+        //   httpOnly: true,
+        //   sameSite: true,
+        // });
         return res.status(200).send({ jwt: token });
       }
       throw new UnauthorizedError('Неправильные почта или пароль');
