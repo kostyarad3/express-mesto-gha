@@ -25,21 +25,16 @@ function createCard(req, res, next) {
 
 function deleteCard(req, res, next) {
   Card.findById(req.params.cardId)
+    .orFail(new NotFoundError('Такой карточки не существует'))
     .then((card) => {
-      if (!card) {
-        next(new NotFoundError('Такой карточки не существует'));
-      } else if (!card.owner.id.equals(req.user._id)) {
+      if (!card.owner.equals(req.user._id)) {
         next(new ForbiddenError('Нет прав на удаление чужой карточки'));
       }
-      return Card.deleteOne(card);
+      return Card.deleteOne(card)
+        .then((deletedCard) => res.send({ data: deletedCard }))
+        .catch(next);
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные при создании карточки.'));
-        return;
-      }
-      next(err);
-    });
+    .catch(next);
 }
 
 function setLike(req, res, next) {
