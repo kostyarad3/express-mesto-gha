@@ -1,11 +1,23 @@
 const router = require('express').Router();
-const userRoutes = require('./users');
-const cardRoutes = require('./cards');
-const { ERROR_NOT_FOUND } = require('../utils/constants');
+const { celebrate, Joi } = require('celebrate');
+const LINK_REGEX = require('../utils/constants');
+const { login, createUser } = require('../controllers/users');
 
-router.use('/users', userRoutes);
-router.use('/cards', cardRoutes);
+router.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), login);
 
-router.use('*', (req, res) => { res.status(ERROR_NOT_FOUND).send({ message: 'Страница не найдена' }); });
+router.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().pattern(LINK_REGEX),
+  }),
+}), createUser);
 
 module.exports = router;
