@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
@@ -10,21 +11,20 @@ function login(req, res, next) {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (user) {
-        const token = jwt.sign({ _id: user._id }, 'secret', {
-          expiresIn: '7d',
-        });
+      const token = jwt.sign({ _id: user._id }, 'secret', {
+        expiresIn: '7d',
+      });
         // для второго варианта
         // res.cookie('jwt', token, {
         //   maxAge: 360000,
         //   httpOnly: true,
         //   sameSite: true,
         // });
-        return res.status(200).send({ jwt: token });
-      }
-      throw new UnauthorizedError('Неправильные почта или пароль');
+      return res.status(200).send({ jwt: token });
     })
-    .catch(next);
+    .catch((err) => {
+      next(new UnauthorizedError('Неправильные почта или пароль'));
+    });
 }
 
 function getUsers(req, res, next) {
@@ -41,13 +41,7 @@ function getCurrentUser(req, res, next) {
 
       throw new NotFoundError('Пользователь с таким id не найден');
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError('Передан некорректный id'));
-        return;
-      }
-      next(err);
-    });
+    .catch(next);
 }
 
 function getUserById(req, res, next) {
@@ -57,13 +51,7 @@ function getUserById(req, res, next) {
 
       throw new NotFoundError('Пользователь с таким id не найден');
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError('Передан некорректный id'));
-        return;
-      }
-      next(err);
-    });
+    .catch(next);
 }
 
 function createUser(req, res, next) {
@@ -71,32 +59,24 @@ function createUser(req, res, next) {
     email, password, name, about, avatar,
   } = req.body;
 
-  User.findOne({ email })
-    .then((isSaved) => {
-      if (!isSaved) {
-        bcrypt.hash(password, 10)
-          .then((hash) => User.create({
-            email,
-            password: hash,
-            name,
-            about,
-            avatar,
-          }))
-          .then((user) => {
-            const { _id } = user;
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      email,
+      password: hash,
+      name,
+      about,
+      avatar,
+    }))
+    .then((user) => {
+      const { _id } = user;
 
-            res.status(201).send({
-              email,
-              name,
-              about,
-              avatar,
-              _id,
-            });
-          })
-          .catch(next);
-      } else {
-        throw new ConflictError('Пользователь с таким email уже существует');
-      }
+      res.status(201).send({
+        email,
+        name,
+        about,
+        avatar,
+        _id,
+      });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -126,13 +106,7 @@ function updateUserInfo(req, res, next) {
 
       throw new NotFoundError('Пользователь с таким id не найден');
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные'));
-        return;
-      }
-      next(err);
-    });
+    .catch(next);
 }
 
 function updateUserAvatar(req, res, next) {
@@ -150,13 +124,7 @@ function updateUserAvatar(req, res, next) {
 
       throw new NotFoundError('Пользователь с таким id не найден');
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные'));
-        return;
-      }
-      next(err);
-    });
+    .catch(next);
 }
 
 module.exports = {
