@@ -2,7 +2,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const UnauthorizedError = require('../errors/unauthorized-err');
 const NotFoundError = require('../errors/not-found-err');
 const BadRequestError = require('../errors/bad-request-err');
 const ConflictError = require('../errors/conflict-err');
@@ -22,9 +21,7 @@ function login(req, res, next) {
         // });
       return res.status(200).send({ jwt: token });
     })
-    .catch((err) => {
-      next(new UnauthorizedError('Неправильные почта или пароль'));
-    });
+    .catch(next);
 }
 
 function getUsers(req, res, next) {
